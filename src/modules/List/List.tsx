@@ -21,8 +21,12 @@ const Error = styled.div`
 const Loading = styled.div`
   justify-content: center;
   height: 100vh;
-  display: flex;
   align-items: center;
+  display: ${({visible}: {visible: boolean}) => (visible ? 'flex' : 'none')}
+`;
+
+const Content = styled.div`
+  display: ${({visible}: {visible: boolean}) => (visible ? 'block' : 'none')}
 `;
 
 export class List extends React.Component<any, ListStateModel> {
@@ -58,11 +62,9 @@ export class List extends React.Component<any, ListStateModel> {
   render() {
     return (
       <Wrapper>
-        {  this.state.isLoaded ?
-          <Loading>Loading...</Loading> :
-          <div>
-            {
-              this.state.error ?
+          <Loading visible={this.state.isLoaded}>Loading...</Loading>
+          <Content visible={!this.state.isLoaded}>
+            {this.state.error ?
                 <Error>{this.state.error}</Error> :
                 this.state.items.map((item) => (
                   <Item href={item.svn_url}
@@ -77,8 +79,7 @@ export class List extends React.Component<any, ListStateModel> {
               <Pagination selectPage={this.selectPage}/> :
               ""
             }
-          </div>
-        }
+          </Content>
       </Wrapper>)
   };
 }
