@@ -11,6 +11,20 @@ const Wrapper = styled.div`
   margin: 10px;
 `;
 
+const Error = styled.div`
+  text-align: center;
+  color: red;
+  bold: 900;
+  margin-bottom: 50px;
+`;
+
+const Loading = styled.div`
+  justify-content: center;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+`;
+
 export class List extends React.Component<any, ListStateModel> {
   constructor(props: any) {
     super(props);
@@ -19,7 +33,6 @@ export class List extends React.Component<any, ListStateModel> {
       error: null,
       isLoaded: null,
       items: [],
-      count: 0
     };
   }
 
@@ -28,18 +41,16 @@ export class List extends React.Component<any, ListStateModel> {
   }
 
   public selectPage = (page: number = 0) => {
+    this.setState({isLoaded: true});
+
     // Из-за того, что массив нумеруется с 0
     // добавим единицу для получения корректной страницы
     GithubService.getPage(page + 1)
       .then(
         (result: GithubResponseModel) => {
-          this.setState({ items: result.items });
-          // Гипотетически можно не обновлять кол-во страниц КАЖДЫЙ раз,
-          // но я заметила, что оно меняется от запроса к запросу
-          this.setState({ count: parseInt((result.total_count / 30).toFixed()) });
-        },
-        (error) => {
-          this.setState({error});
+          this.setState({ error: null, items: result.items, isLoaded: false });
+        }).catch(() => {
+          this.setState({ error: 'Please try later!', isLoaded: false });
         }
       )
   };
@@ -47,17 +58,26 @@ export class List extends React.Component<any, ListStateModel> {
   render() {
     return (
       <Wrapper>
-        {this.state.items.map((item, index) => (
-          <Item href={item.svn_url}
-                owner={item.owner.login}
-                packageName={item.name}
-                stars={item.stargazers_count}
-                key={index}>
-          </Item>
-        ))}
-        {this.state.count ?
-          <Pagination pages={new Array(this.state.count).fill(0).map((item, index) => index)} selectPage={this.selectPage}/> :
-          ""
+        {  this.state.isLoaded ?
+          <Loading>Loading...</Loading> :
+          <div>
+            {
+              this.state.error ?
+                <Error>{this.state.error}</Error> :
+                this.state.items.map((item) => (
+                  <Item href={item.svn_url}
+                        owner={item.owner.login}
+                        packageName={item.name}
+                        stars={item.stargazers_count}
+                        key={item.id}>
+                  </Item>
+                ))
+            }
+            {this.state.items.length ?
+              <Pagination selectPage={this.selectPage}/> :
+              ""
+            }
+          </div>
         }
       </Wrapper>)
   };

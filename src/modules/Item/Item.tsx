@@ -29,6 +29,12 @@ const Title = styled.div`
   bold: 800;
   color: grey;
   font-size: 16px;
+  
+  @media(max-width: 400px) {
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `;
 
 const Stars = styled.div`
@@ -52,7 +58,7 @@ const Author = styled.div`
 `;
 
 export function Item(props: ItemModel = {}) {
-  return <Wrapper href={props.href}>
+  return <Wrapper target='_blank' href={props.href}>
       <Column>
         <Title>{props.packageName}</Title>
         <Author>{props.owner}</Author>

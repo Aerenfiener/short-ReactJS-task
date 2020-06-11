@@ -4,5 +4,4 @@ export class ListStateModel {
   error: string;
   isLoaded: boolean;
   items: GithubResponseItemModel[];
-  count: number;
 }

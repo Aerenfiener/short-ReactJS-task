@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from 'styled-components';
 import { PaginationPropsModel } from "./Pagination.model";
+import { COUNT_OF_ITEMS, PAGE_CONTAINS } from "../../constants/constants";
 
 const PaginatorWrapper = styled.div`
   width: 100wh;
@@ -33,25 +34,27 @@ const StyledComp = styled.div`
 `;
 
 const Page = ({isCurrent, pageNumber}: {isCurrent: boolean, pageNumber: number}) => (
-  <StyledComp isCurrent={ isCurrent  }>{ pageNumber + 1 }</StyledComp>
+  <StyledComp isCurrent={ isCurrent }>{ pageNumber + 1 }</StyledComp>
 );
 
 export function Pagination(props: PaginationPropsModel) {
     const [page, setPage] = useState(0);
+    const count = parseInt((COUNT_OF_ITEMS / PAGE_CONTAINS ).toFixed());
+    const pages = Array.from(Array(count).keys());
 
     const changePage = (item: number) => {
+      if (item === page) return;
       setPage(item);
       props.selectPage(item);
     };
 
-
     return <PaginatorWrapper>
       <PaginationList>
-      {props.pages.map((item: number) =>
-        <div key={ item } onClick={() => changePage(item)}>
-          <Page pageNumber={ item } isCurrent={ page === item }/>
-        </div>
-      )}
+        {pages.map((item: number) =>
+          <div key={ item } onClick={() => changePage(item)}>
+            <Page pageNumber={ item } isCurrent={ page === item }/>
+          </div>
+        )}
       </PaginationList>
     </PaginatorWrapper>
 }
